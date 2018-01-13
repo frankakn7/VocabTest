@@ -5,8 +5,6 @@
 import random
 import os
 
-running = True
-
 def createVariableList(filename):
 	variableList = {}
 	try:
@@ -40,30 +38,30 @@ def createStatisticList(filename):
 def getKey(item):
 	return item[1]
 
-def sortStats():
-	global stats
+def sortStats(stats):
 	sortedStats = []
 	for word in stats:
 		sortedStats.append([word,stats[word][2]])
 	sortedStats.sort(key=getKey)
 	return sortedStats
 
-def writeStats(filename):
-	global stats
+def writeStats(filename,stats):
 	file = open(filename, 'w')
-	sStats = sortStats()
+	sStats = sortStats(stats)
 	for i in sStats:
 		stats[i[0]][2] = int((float(stats[i[0]][0]) / float(stats[i[0]][1]))*100)
 		file.write(i[0]+":"+str(stats[i[0]][0])+"/"+str(stats[i[0]][1])+":"+str(stats[i[0]][2])+"%\n")
 	file.close()
 
 def allKeys():
-	global vocs
+	variables = createVariableList('Vocs.txt')
+	vocs = []
 	for i in variables:
 		vocs.append(i)
+	return vocs
 
 def createMini(length):
-	global vocs
+	vocs = allKeys()
 	miniVocs = []
 	for i in range(length):
 		randomWord = random.choice(vocs)
@@ -80,10 +78,17 @@ def printWrong(key):
 	print("Past participle: "+variables[key][2])
 	raw_input("press ENTER to continue...")
 
-def test():
-	global vocs
-	global variables
-	global stats
+def printResult(vocs, correct, testTimes, incorrect):
+	os.system('clear')
+	print("your score is "+str(correct)+"/"+str(testTimes))
+	if int(correct) != int(testTimes):
+		print("Words you didn't know: ")
+	for i in incorrect:
+		print(i)
+	raw_input("press ENTER to return to menu...")
+
+def test(vocs,stats):
+	variables = createVariableList('Vocs.txt')
 	correct = 0
 	testTimes = len(vocs)
 	incorrect = []
@@ -107,14 +112,8 @@ def test():
 		stats[word][2] = int((float(stats[word][0]) / float(stats[word][1]))*100)
 		printWrong(word)
 		incorrect.append(word)
-	allKeys()
-	os.system('clear')
-	print("your score is "+str(correct)+"/"+str(testTimes))
-	if int(correct) != int(testTimes):
-		print("Words you didn't know: ")
-	for i in incorrect:
-		print(i)
-	raw_input("press ENTER to return to menu...")
+	writeStats('ZuLernen.txt', stats)
+	printResult(vocs, correct, testTimes, incorrect)
 
 def lowest():
 	sStats = sortStats()
@@ -130,24 +129,17 @@ def lowest():
 	return lowList
 
 def lowTest():
-	global vocs
-	allKeys()
 	vocs = lowest()
-	test()
-	writeStats('ZuLernen.txt')
+	test(vocs, createStatisticList('ZuLernen.txt'))
 
 def miniTest():
-	global vocs
 	length = int(raw_input("Length of the Test (Words): "))
-	allKeys()
 	vocs = createMini(length)
-	test()
-	writeStats('ZuLernen.txt')
+	test(vocs, createStatisticList('ZuLernen.txt'))
 
 def fullTest():
-	allKeys()
-	test()
-	writeStats('ZuLernen.txt')
+	vocs = allKeys()
+	test(vocs, createStatisticList('ZuLernen.txt'))
 
 def showStats():
 	os.system('clear')
@@ -158,15 +150,14 @@ def showStats():
 	raw_input("press ENTER to return to menu...")
 
 def kill():
-	global running
 	choice = raw_input("Are you sure? [y/n]: ")
 	if choice == "y":
-		running = False
+		return False
 	elif choice == "n":
-		running = True
+		return True
 
 def menu():
-	global running
+	running = True
 	options = {"1": fullTest, "2": miniTest, "3": lowTest, "4": showStats, "5": kill}
 	while running:
 		os.system('clear')
@@ -176,14 +167,12 @@ def menu():
 		print("[4] Show stats")
 		print("[5] Exit")
 		try:
-			options[raw_input("Choice: ")]()
+			running = options[raw_input("Choice: ")]()
+			if running == None:
+				running = True
 		except:
 			print("Not a valid choice...")
 			raw_input("press ENTER to continue")
-
-stats = createStatisticList('ZuLernen.txt')
-variables = createVariableList('Vocs.txt')
-vocs = []
 
 menu()
 	
