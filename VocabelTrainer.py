@@ -53,15 +53,15 @@ def writeStats(filename,stats):
 		file.write(i[0]+":"+str(stats[i[0]][0])+"/"+str(stats[i[0]][1])+":"+str(stats[i[0]][2])+"%\n")
 	file.close()
 
-def allKeys():
-	variables = createVariableList('Vocs.txt')
+def allKeys(vocFile):
+	variables = createVariableList(vocFile)
 	vocs = []
 	for i in variables:
 		vocs.append(i)
 	return vocs
 
-def createMini(length):
-	vocs = allKeys()
+def createMini(length, vocFile):
+	vocs = allKeys(vocFile)
 	miniVocs = []
 	for i in range(length):
 		randomWord = random.choice(vocs)
@@ -70,7 +70,7 @@ def createMini(length):
 		miniVocs.append(randomWord)
 	return miniVocs
 
-def printWrong(key):
+def printWrong(variables, key):
 	print("Wrong!")
 	print("Correct answers would be: ")
 	print("Verb: "+variables[key][0])
@@ -87,8 +87,8 @@ def printResult(vocs, correct, testTimes, incorrect):
 		print(i)
 	raw_input("press ENTER to return to menu...")
 
-def test(vocs,stats):
-	variables = createVariableList('Vocs.txt')
+def test(vocs,stats, vocFile, statFile):
+	variables = createVariableList(vocFile)
 	correct = 0
 	testTimes = len(vocs)
 	incorrect = []
@@ -110,9 +110,9 @@ def test(vocs,stats):
 				stats[word][2] = int((float(stats[word][0]) / float(stats[word][1]))*100)
 				continue
 		stats[word][2] = int((float(stats[word][0]) / float(stats[word][1]))*100)
-		printWrong(word)
+		printWrong(variables, word)
 		incorrect.append(word)
-	writeStats('ZuLernen.txt', stats)
+	writeStats(statFile, stats)
 	printResult(vocs, correct, testTimes, incorrect)
 
 def lowest():
@@ -128,28 +128,28 @@ def lowest():
 		lowList.append(randomWord)
 	return lowList
 
-def lowTest():
+def lowTest(vocFile, statFile):
 	vocs = lowest()
-	test(vocs, createStatisticList('ZuLernen.txt'))
+	test(vocs, createStatisticList(statFile), vocFile, statFile)
 
-def miniTest():
+def miniTest(vocFile, statFile):
 	length = int(raw_input("Length of the Test (Words): "))
-	vocs = createMini(length)
-	test(vocs, createStatisticList('ZuLernen.txt'))
+	vocs = createMini(length, vocFile)
+	test(vocs, createStatisticList(statFile), vocFile, statFile)
 
-def fullTest():
-	vocs = allKeys()
-	test(vocs, createStatisticList('ZuLernen.txt'))
+def fullTest(vocFile, statFile):
+	vocs = allKeys(vocFile)
+	test(vocs, createStatisticList(statFile), vocFile, statFile)
 
-def showStats():
+def showStats(vocFile, statFile):
 	os.system('clear')
-	file = open('ZuLernen.txt', 'r')
+	file = open(statFile, 'r')
 	for i in file.readlines():
 		print(i[:-1])
 	file.close()
 	raw_input("press ENTER to return to menu...")
 
-def kill():
+def kill(vocFile, statFile):
 	choice = raw_input("Are you sure? [y/n]: ")
 	if choice == "y":
 		return False
@@ -159,6 +159,8 @@ def kill():
 def menu():
 	running = True
 	options = {"1": fullTest, "2": miniTest, "3": lowTest, "4": showStats, "5": kill}
+	vocFile = 'Vocs.txt'
+	statFile = 'ZuLernen.txt'
 	while running:
 		os.system('clear')
 		print("[1] Full Test")
@@ -167,7 +169,7 @@ def menu():
 		print("[4] Show stats")
 		print("[5] Exit")
 		try:
-			running = options[raw_input("Choice: ")]()
+			running = options[raw_input("Choice: ")](vocFile, statFile)
 			if running == None:
 				running = True
 		except:
