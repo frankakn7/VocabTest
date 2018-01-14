@@ -45,8 +45,8 @@ def sortStats(stats):
 	sortedStats.sort(key=getKey)
 	return sortedStats
 
-def writeStats(filename,stats):
-	file = open(filename, 'w')
+def writeStats(statFile,stats):
+	file = open(statFile, 'w')
 	sStats = sortStats(stats)
 	for i in sStats:
 		stats[i[0]][2] = int((float(stats[i[0]][0]) / float(stats[i[0]][1]))*100)
@@ -115,13 +115,13 @@ def test(vocs,stats, vocFile, statFile):
 	writeStats(statFile, stats)
 	printResult(vocs, correct, testTimes, incorrect)
 
-def lowest():
-	sStats = sortStats()
+def lowest(statFile):
+	sStats = sortStats(createStatisticList(statFile))
 	lowest = []
 	lowList = []
 	for i in range(25):
 		lowest.append(sStats[i][0])
-	for i in range(10):
+	for i in range(10):							
 		randomWord = random.choice(lowest)
 		while randomWord in lowList:
 			randomWord = random.choice(lowest)
@@ -129,7 +129,7 @@ def lowest():
 	return lowList
 
 def lowTest(vocFile, statFile):
-	vocs = lowest()
+	vocs = lowest(statFile)
 	test(vocs, createStatisticList(statFile), vocFile, statFile)
 
 def miniTest(vocFile, statFile):
@@ -168,13 +168,13 @@ def menu():
 		print("[3] Low Test")
 		print("[4] Show stats")
 		print("[5] Exit")
-		try:
-			running = options[raw_input("Choice: ")](vocFile, statFile)
-			if running == None:
-				running = True
-		except:
-			print("Not a valid choice...")
-			raw_input("press ENTER to continue")
+		#try:
+		running = options[raw_input("Choice: ")](vocFile, statFile)
+		if running == None:
+			running = True
+		#except:
+			#print("Not a valid choice...")
+			#raw_input("press ENTER to continue")
 
 menu()
 	

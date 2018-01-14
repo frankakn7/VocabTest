@@ -8,7 +8,7 @@ def sortIt():
 	file.close()
 	file = open('ZuLernen.txt','w')
 	for i in words:
-		file.write(i+":0/1:100%\n")
+		file.write(i+":0/1:0%\n")
 	file.close()
 
 sortIt()
